@@ -20,7 +20,7 @@
           ><UButton
             color="white"
             variant="ghost"
-            trailing-icon="i-heroicons-ellipsis-horizontal-"
+            trailing-icon="i-heroicons-ellipsis-horizontal"
         /></UDropdown>
       </div>
     </div>

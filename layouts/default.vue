@@ -8,7 +8,8 @@
 </template>
 
 <script setup>
-// Link to Google Fonts
+const colorMode = useColorMode();
+colorMode.preference = "system";
 useHead({
   link: [
     {
