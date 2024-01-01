@@ -38,6 +38,10 @@
       :loading="false"
     />
   </section>
+  <section>
+    <Transaction />
+    <Transaction />
+  </section>
 </template>
 
 <script setup>
