@@ -134,6 +134,13 @@ const transactionsGroupByDate = computed(() => {
     }
     grouped[date].push(transaction);
   }
+  //   Sort on the frontend (Since we are sorting on the backend it is commented)
+  //   const sortedKeys = Object.keys(grouped).sort().reverse();
+  //   const sortedGrouped = {};
+  //   for (const key of sortedKeys) {
+  //     sortedGrouped[key] = grouped[key]
+  //   }
+  //   return sortedGrouped;
   return grouped;
 });
 </script>
