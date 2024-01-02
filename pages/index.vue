@@ -42,7 +42,7 @@
     <div>
       <h2 class="text-2xl font-extrabold">transactions</h2>
       <div class="text-gray-500 dark:text-gray-400">
-        You have {{ incomeCount }} incomes and {{ expenseCome }} expenses this
+        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses this
         period
       </div>
     </div>
@@ -95,11 +95,15 @@ const {
     grouped: { byDate: transactionsGroupByDate }, // alias name for. the byDate (not necessary, just for learning)
   },
 } = useFetchTransactions(current);
+await refresh();
 
 const {
+  refresh: refreshPrevious,
   transactions: {
     incomeTotal: prevIncomeTotal,
     expenseTotal: prevExpenseTotal,
   },
 } = useFetchTransactions(previous);
+// check video 84, there is a bug
+//await refreshPrevious();
 </script>

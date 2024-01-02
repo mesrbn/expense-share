@@ -44,7 +44,9 @@ export const useFetchTransactions = (period) => {
 
   const refresh = async () => (transactions.value = await fetchTransactions());
 
+  // check video 84, there is a bug
   watch(period, async () => await refresh(), { immediate: true });
+  // watch(period, async () => await refresh());
 
   const transactionsGroupByDate = computed(() => {
     let grouped = {};
