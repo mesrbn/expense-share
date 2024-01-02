@@ -107,7 +107,10 @@ const fetchTransactions = async () => {
   isLoading.value = true;
   try {
     const { data } = await useAsyncData("transactions", async () => {
-      const { data, error } = await supabase.from("transactions").select();
+      const { data, error } = await supabase
+        .from("transactions")
+        .select()
+        .order("created_at", { ascending: false });
       if (error) return [];
       return data;
     });
@@ -119,7 +122,9 @@ const fetchTransactions = async () => {
 
 const refreshTransactions = async () =>
   (transactions.value = await fetchTransactions());
+
 await refreshTransactions();
+
 const transactionsGroupByDate = computed(() => {
   let grouped = {};
   for (const transaction of transactions.value) {
