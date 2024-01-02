@@ -107,7 +107,10 @@ const fetchTransactions = async () => {
   isLoading.value = true;
   try {
     const { data } = await useAsyncData("transactions", async () => {
-      const { data, error } = await supabase.from("transactions").select();
+      const { data, error } = await supabase
+        .from("transactions")
+        .select()
+        .order("created_at", { ascending: false });
       if (error) return [];
       return data;
     });
@@ -119,7 +122,9 @@ const fetchTransactions = async () => {
 
 const refreshTransactions = async () =>
   (transactions.value = await fetchTransactions());
+
 await refreshTransactions();
+
 const transactionsGroupByDate = computed(() => {
   let grouped = {};
   for (const transaction of transactions.value) {
@@ -129,6 +134,13 @@ const transactionsGroupByDate = computed(() => {
     }
     grouped[date].push(transaction);
   }
+  //   Sort on the frontend (Since we are sorting on the backend it is commented)
+  //   const sortedKeys = Object.keys(grouped).sort().reverse();
+  //   const sortedGrouped = {};
+  //   for (const key of sortedKeys) {
+  //     sortedGrouped[key] = grouped[key]
+  //   }
+  //   return sortedGrouped;
   return grouped;
 });
 </script>
