@@ -2,7 +2,7 @@
   <UModal v-model="isOpen">
     <UCard>
       <template #header> Add Transaction </template>
-      <UForm :state="state">
+      <UForm :state="state" :schema="schema" ref="form" @submit.prevent="save">
         <UFormGroup
           label="Transaction Type"
           :required="true"
@@ -51,6 +51,7 @@
           label="Category"
           name="category"
           class="mb-4"
+          v-if="state.type === 'Expense'"
         >
           <USelect
             placeholder="Category"
@@ -66,6 +67,7 @@
 
 <script setup>
 import { categories, types } from "~/constants";
+import { z } from "zod";
 // we need to simulate 2 way biding in our custom modal component
 // https://vuejs.org/guide/components/v-model.html
 const props = defineProps({
@@ -80,6 +82,48 @@ const state = ref({
   description: undefined,
   category: undefined,
 });
+
+// https://www.npmjs.com/package/zod#discriminated-unions
+const defaultSchema = z.object({
+  created_at: z.string(),
+  description: z.string().optional(),
+  amount: z.number().positive("Amount must be greater than 0"),
+});
+
+const incomeSchema = z.object({
+  type: z.literal("Income"),
+});
+
+const expenseSchema = z.object({
+  type: z.literal("Expense"),
+  category: z.enum(categories),
+});
+
+const investmentSchema = z.object({
+  type: z.literal("Investment"),
+});
+
+const savingSchema = z.object({
+  type: z.literal("Saving"),
+});
+
+const schema = z.intersection(
+  z.discriminatedUnion("type", [
+    incomeSchema,
+    expenseSchema,
+    investmentSchema,
+    savingSchema,
+  ]),
+  defaultSchema
+);
+
+// We want to access the form dom and triger the validation method manually
+const form = ref();
+
+const save = async () => {
+  // UForm has a validate methid and when you call this method it checks all the schema you defined
+  form.value.validate();
+};
 
 const isOpen = computed({
   get: () => props.modelValue,
