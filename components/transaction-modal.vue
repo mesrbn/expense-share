@@ -2,7 +2,7 @@
   <UModal v-model="isOpen">
     <UCard>
       <template #header> Add Transaction </template>
-      <UForm :state="state" :schema="schema" ref="form" @submit.prevent="save">
+      <UForm :state="state" :schema="schema" ref="form" @submit="save">
         <UFormGroup
           label="Transaction Type"
           :required="true"
@@ -59,7 +59,13 @@
             v-model="state.category"
           />
         </UFormGroup>
-        <UButton type="submit" color="black" variant="solid" label="Save" />
+        <UButton
+          type="submit"
+          color="black"
+          variant="solid"
+          label="Save"
+          :loading="isLoading"
+        />
       </UForm>
     </UCard>
   </UModal>
@@ -73,7 +79,7 @@ import { z } from "zod";
 const props = defineProps({
   modelValue: Boolean,
 });
-const emit = defineEmits("[update:modelValue]");
+const emit = defineEmits(["update:modelValue", "saved"]);
 
 const initialState = ref({
   type: undefined,
@@ -128,6 +134,9 @@ const schema = z.intersection(
 
 // We want to access the form dom and triger the validation method manually
 const form = ref();
+const isLoading = ref(false);
+const supabase = useSupabaseClient();
+const toast = useToast();
 
 const save = async () => {
   // UForm has a validate methid and when you call this method it checks all the schema you defined
@@ -135,7 +144,32 @@ const save = async () => {
   // In the new version of the UForm, this method will be called automatically when writing :validate-on="['blur', ...]". Therefore, we commented this out
   if (form.value.errors.length) return;
 
+  isLoading.value = true;
   // Store into the Supabase
+  try {
+    const { error } = await supabase
+      .from("transactions")
+      .upsert({ ...state.value });
+    if (!error) {
+      toast.add({
+        title: "Transaction saved",
+        icon: "i-heroicons-check-circle",
+      });
+      isOpen.value = false;
+      emit("saved");
+      return;
+    }
+    throw error;
+  } catch (e) {
+    toast.add({
+      title: "Transaction not saved",
+      description: e.message,
+      icon: "i-heroicons-exclamation-circle",
+      color: "red",
+    });
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const isOpen = computed({
