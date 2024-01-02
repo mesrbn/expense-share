@@ -13,14 +13,14 @@
       color="green"
       title="Income"
       :amount="incomeTotal"
-      :lastAmount="3000"
+      :lastAmount="prevIncomeTotal"
       :loading="isLoading"
     />
     <Trend
       color="green"
       title="Expense"
       :amount="expenseTotal"
-      :lastAmount="3000"
+      :lastAmount="prevExpenseTotal"
       :loading="isLoading"
     />
     <Trend
@@ -82,7 +82,7 @@ import { transactionViewOptions } from "~/constants";
 
 const isOpen = ref(false);
 const selectedView = ref(transactionViewOptions[1]);
-const dates = useSelectedTimePeriod(selectedView);
+const { current, previous } = useSelectedTimePeriod(selectedView);
 
 const {
   pending: isLoading,
@@ -94,7 +94,12 @@ const {
     expenseTotal,
     grouped: { byDate: transactionsGroupByDate }, // alias name for. the byDate (not necessary, just for learning)
   },
-} = useFetchTransactions();
+} = useFetchTransactions(current);
 
-await refresh();
+const {
+  transactions: {
+    incomeTotal: prevIncomeTotal,
+    expenseTotal: prevExpenseTotal,
+  },
+} = useFetchTransactions(previous);
 </script>
