@@ -75,13 +75,22 @@ const props = defineProps({
 });
 const emit = defineEmits("[update:modelValue]");
 
-const state = ref({
+const initialState = ref({
   type: undefined,
   amount: 0,
   created_at: undefined,
   description: undefined,
   category: undefined,
 });
+
+const state = ref({
+  ...initialState.value,
+});
+
+const resetForm = () => {
+  Object.assign(state.value, initialState);
+  form.value.clear();
+};
 
 // https://www.npmjs.com/package/zod#discriminated-unions
 const defaultSchema = z.object({
@@ -122,11 +131,18 @@ const form = ref();
 
 const save = async () => {
   // UForm has a validate methid and when you call this method it checks all the schema you defined
-  form.value.validate();
+  // form.value.validate();
+  // In the new version of the UForm, this method will be called automatically when writing :validate-on="['blur', ...]". Therefore, we commented this out
+  if (form.value.errors.length) return;
+
+  // Store into the Supabase
 };
 
 const isOpen = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
+  set: (value) => {
+    if (!value) resetForm();
+    emit("update:modelValue", value);
+  },
 });
 </script>
