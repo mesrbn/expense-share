@@ -13,14 +13,14 @@
       color="green"
       title="Income"
       :amount="incomeTotal"
-      :lastAmount="3000"
+      :lastAmount="prevIncomeTotal"
       :loading="isLoading"
     />
     <Trend
       color="green"
       title="Expense"
       :amount="expenseTotal"
-      :lastAmount="3000"
+      :lastAmount="prevExpenseTotal"
       :loading="isLoading"
     />
     <Trend
@@ -42,7 +42,7 @@
     <div>
       <h2 class="text-2xl font-extrabold">transactions</h2>
       <div class="text-gray-500 dark:text-gray-400">
-        You have {{ incomeCount }} incomes and {{ expenseCome }} expenses this
+        You have {{ incomeCount }} incomes and {{ expenseCount }} expenses this
         period
       </div>
     </div>
@@ -80,6 +80,10 @@
 <script setup>
 import { transactionViewOptions } from "~/constants";
 
+const isOpen = ref(false);
+const selectedView = ref(transactionViewOptions[1]);
+const { current, previous } = useSelectedTimePeriod(selectedView);
+
 const {
   pending: isLoading,
   refresh,
@@ -90,10 +94,16 @@ const {
     expenseTotal,
     grouped: { byDate: transactionsGroupByDate }, // alias name for. the byDate (not necessary, just for learning)
   },
-} = useFetchTransactions();
-const selectedView = ref(transactionViewOptions[1]);
-
-const isOpen = ref(false);
-
+} = useFetchTransactions(current);
 await refresh();
+
+const {
+  refresh: refreshPrevious,
+  transactions: {
+    incomeTotal: prevIncomeTotal,
+    expenseTotal: prevExpenseTotal,
+  },
+} = useFetchTransactions(previous);
+// check video 84, there is a bug
+//await refreshPrevious();
 </script>
