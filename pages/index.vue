@@ -80,6 +80,10 @@
 <script setup>
 import { transactionViewOptions } from "~/constants";
 
+const isOpen = ref(false);
+const selectedView = ref(transactionViewOptions[1]);
+const dates = useSelectedTimePeriod(selectedView);
+
 const {
   pending: isLoading,
   refresh,
@@ -91,9 +95,6 @@ const {
     grouped: { byDate: transactionsGroupByDate }, // alias name for. the byDate (not necessary, just for learning)
   },
 } = useFetchTransactions();
-const selectedView = ref(transactionViewOptions[1]);
-
-const isOpen = ref(false);
 
 await refresh();
 </script>
