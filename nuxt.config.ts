@@ -3,6 +3,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxt/ui", "@nuxtjs/supabase", "@nuxtjs/color-mode"],
   supabase: {
-    redirect: false,
+    redirect: true,
   },
 });
