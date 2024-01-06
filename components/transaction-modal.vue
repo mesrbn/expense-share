@@ -1,7 +1,9 @@
 <template>
   <UModal v-model="isOpen">
     <UCard>
-      <template #header> Add Transaction </template>
+      <template #header>
+        {{ isEditing ? "Edit" : "ADD" }} Transaction
+      </template>
       <UForm :state="state" :schema="schema" ref="form" @submit="save">
         <UFormGroup
           label="Transaction Type"
@@ -10,8 +12,9 @@
           class="mb-4"
         >
           <USelect
-            placeholder="Select the transaction type"
             :options="types"
+            :disabled="isEditing"
+            placeholder="Select the transaction type"
             v-model="state.type"
           />
         </UFormGroup>
@@ -78,7 +81,12 @@ import { z } from "zod";
 // https://vuejs.org/guide/components/v-model.html
 const props = defineProps({
   modelValue: Boolean,
+  transaction: {
+    type: Object,
+    required: false,
+  },
 });
+const isEditing = computed(() => !!props.transaction);
 const emit = defineEmits(["update:modelValue", "saved"]);
 
 const initialState = ref({
@@ -89,9 +97,17 @@ const initialState = ref({
   category: undefined,
 });
 
-const state = ref({
-  ...initialState.value,
-});
+const state = ref(
+  isEditing.value
+    ? {
+        type: props.transaction.type,
+        amount: props.transaction.amount,
+        created_at: props.transaction.created_at.split("T")[0],
+        description: props.transaction.description,
+        category: props.transaction.category,
+      }
+    : { ...initialState.value }
+);
 
 const resetForm = () => {
   Object.assign(state.value, initialState);
@@ -149,7 +165,7 @@ const save = async () => {
   try {
     const { error } = await supabase
       .from("transactions")
-      .upsert({ ...state.value });
+      .upsert({ ...state.value, id: props.transaction?.id }); // when adding a transaction, there is no id and it will be automatically generated, when it is editing, we have id and we use it here
     if (!error) {
       toastSuccess({
         title: "Transaction saved",
