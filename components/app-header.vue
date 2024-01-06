@@ -7,10 +7,7 @@
         :ui="{ item: { disabled: 'cursor-text select-text' }, width: 'w-64' }"
         v-if="user"
       >
-        <UAvatar
-          src="https://profile.s3.nl-ams.scw.cloud/mehran-s.jpg"
-          alt="Avatar"
-        />
+        <UAvatar :src="url" alt="Avatar" />
 
         <template #account="{ item }">
           <div class="text-left">
@@ -37,6 +34,7 @@
 <script setup>
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
+const { url } = useAvatarUrl();
 const items = [
   [
     {
